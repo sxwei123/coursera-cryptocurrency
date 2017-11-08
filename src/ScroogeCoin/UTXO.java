@@ -1,3 +1,5 @@
+package ScroogeCoin;
+
 import java.util.Arrays;
 
 // Unspent Transaction Output
