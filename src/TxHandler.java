@@ -1,5 +1,3 @@
-package ScroogeCoin;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +72,11 @@ public class TxHandler {
             if(removeTxFromUTXOPoolIfValid(ptx)){
                 mvTxs[index] = ptx;
                 index++;
+                //valid transaction can be the input of next transactions, add ptx to utxoPool
+                for(int i=0; i<ptx.numOutputs(); i++){
+                    UTXO utxo = new UTXO(ptx.getHash(), i);
+                    currentUTXOPool.addUTXO(utxo, ptx.getOutput(i));
+                }
             }
         }
 
