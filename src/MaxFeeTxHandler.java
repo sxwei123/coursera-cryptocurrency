@@ -110,6 +110,7 @@ public class MaxFeeTxHandler {
             currentValidTxsTotalFees += transactionFees.get(cvt);
         }
         //if this is the max fee tx set ever found, store it in currentMaxFeesTxs
+        System.out.println("currentValideTotal:"+currentValidTxsTotalFees + ", max:" + maxTxFee);
         if(currentValidTxsTotalFees >= maxTxFee){
             maxTxFee = currentValidTxsTotalFees;
             currentMaxFeesTxs = currentValidTxs;

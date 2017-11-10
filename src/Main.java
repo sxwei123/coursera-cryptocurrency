@@ -22,6 +22,7 @@ public class Main {
          */
         KeyPair pk_scrooge = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         KeyPair pk_alice   = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+        KeyPair pk_bob = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
         /*
          * Set up the root transaction:
@@ -58,7 +59,7 @@ public class Main {
 
         // I split the coin of value 10 into 3 coins and send all of them for simplicity to
         // the same address (Alice)
-        tx2.addOutput(5, pk_alice.getPublic());
+        tx2.addOutput(5, pk_bob.getPublic());
         tx2.addOutput(3, pk_alice.getPublic());
         tx2.addOutput(2, pk_alice.getPublic());
         // Note that in the real world fixed-point types would be used for the values, not doubles.
@@ -68,7 +69,20 @@ public class Main {
         // There is only one (at position 0) Transaction.Input in tx2
         // and it contains the coin from Scrooge, therefore I have to sign with the private key from Scrooge
         tx2.signTx(pk_scrooge.getPrivate(), 0);
-        
+
+
+        Tx tx3 = new Tx();
+        tx3.addInput(tx2.getHash(), 0);
+        tx3.addOutput(3.52, pk_alice.getPublic());
+        tx3.addOutput(1.241, pk_alice.getPublic());
+        tx3.signTx(pk_bob.getPrivate(), 0);
+
+        Tx tx4 = new Tx();
+        tx4.addInput(tx2.getHash(), 0);
+        tx4.addOutput(2.21, pk_alice.getPublic());
+        tx4.signTx(pk_bob.getPrivate(), 0);
+
+       System.out.println(tx2.getHash()+" , " +tx3.getHash() + " , "+ tx4.getHash());
         /*
          * Start the test
          */
@@ -76,8 +90,12 @@ public class Main {
         // the coin from Scrooge.
         MaxFeeTxHandler txHandler = new MaxFeeTxHandler(utxoPool);
         System.out.println("txHandler.isValidTx(tx2) returns: " + txHandler.isValidTx(tx2));
+        Transaction[] selectedTrans = txHandler.handleTxs(new Transaction[]{tx2, tx3, tx4});
+        for(Transaction sTx: selectedTrans){
+            System.out.print(sTx.getHash() + " , ");
+        }
         System.out.println("txHandler.handleTxs(new Transaction[]{tx2}) returns: " +
-            txHandler.handleTxs(new Transaction[]{tx2}).length + " transaction(s)");
+                selectedTrans.length + " transaction(s)");
 
     }
 
