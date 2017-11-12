@@ -11,6 +11,7 @@
 
 import java.math.BigInteger;
 import java.security.*;
+import java.util.ArrayList;
 import java.util.Stack;
 
 public class Main {
@@ -23,6 +24,8 @@ public class Main {
         KeyPair pk_scrooge = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         KeyPair pk_alice   = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         KeyPair pk_bob = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+        KeyPair pk_sam = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+        KeyPair pk_john = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
         /*
          * Set up the root transaction:
@@ -49,8 +52,9 @@ public class Main {
         UTXO utxo = new UTXO(tx.getHash(),0);
         utxoPool.addUTXO(utxo, tx.getOutput(0));
 
+        ArrayList<Tx> txs = new ArrayList<>();
         /*  
-         * Set up a test Transaction
+         * Set up test Transactions
          */
         Tx tx2 = new Tx();
 
@@ -59,9 +63,9 @@ public class Main {
 
         // I split the coin of value 10 into 3 coins and send all of them for simplicity to
         // the same address (Alice)
-        tx2.addOutput(5, pk_bob.getPublic());
-        tx2.addOutput(3, pk_alice.getPublic());
+        tx2.addOutput(3, pk_bob.getPublic());
         tx2.addOutput(2, pk_alice.getPublic());
+        tx2.addOutput(5, pk_sam.getPublic());
         // Note that in the real world fixed-point types would be used for the values, not doubles.
         // Doubles exhibit floating-point rounding errors. This type should be for example BigInteger
         // and denote the smallest coin fractions (Satoshi in Bitcoin).
@@ -69,34 +73,53 @@ public class Main {
         // There is only one (at position 0) Transaction.Input in tx2
         // and it contains the coin from Scrooge, therefore I have to sign with the private key from Scrooge
         tx2.signTx(pk_scrooge.getPrivate(), 0);
-
+        txs.add(tx2);
 
         Tx tx3 = new Tx();
-        tx3.addInput(tx2.getHash(), 0);
-        tx3.addOutput(3.52, pk_alice.getPublic());
-        tx3.addOutput(1.241, pk_alice.getPublic());
-        tx3.signTx(pk_bob.getPrivate(), 0);
+        tx3.addInput(tx2.getHash(), 1);
+        tx3.addInput(tx2.getHash(), 2);
+        tx3.addOutput(4.1, pk_alice.getPublic());
+        tx3.addOutput(1.2, pk_bob.getPublic());
+        tx3.addOutput(1.3, pk_john.getPublic());
+        tx3.signTx(pk_alice.getPrivate(), 0);
+        tx3.signTx(pk_sam.getPrivate(), 1);
+        txs.add(tx3);
 
         Tx tx4 = new Tx();
         tx4.addInput(tx2.getHash(), 0);
-        tx4.addOutput(2.21, pk_alice.getPublic());
+        tx4.addInput(tx2.getHash(), 1);
+        tx4.addOutput(4.0, pk_sam.getPublic());
+        tx4.addOutput(0.2, pk_bob.getPublic());
         tx4.signTx(pk_bob.getPrivate(), 0);
+        tx4.signTx(pk_alice.getPrivate(), 1);
+        txs.add(tx4);
 
-       System.out.println(tx2.getHash()+" , " +tx3.getHash() + " , "+ tx4.getHash());
+        Tx tx5 = new Tx();
+        tx5.addInput(tx2.getHash(), 0);
+        tx5.addInput(tx3.getHash(), 0);
+        tx5.addInput(tx3.getHash(), 2);
+        tx5.addOutput(4.6, pk_john.getPublic());
+        tx5.addOutput(3.5, pk_bob.getPublic());
+        tx5.signTx(pk_bob.getPrivate(), 0);
+        tx5.signTx(pk_alice.getPrivate(), 1);
+        tx5.signTx(pk_john.getPrivate(), 2);
+        txs.add(tx5);
+
         /*
          * Start the test
          */
         // Remember that the utxoPool contains a single unspent Transaction.Output which is
         // the coin from Scrooge.
         MaxFeeTxHandler txHandler = new MaxFeeTxHandler(utxoPool);
-        System.out.println("txHandler.isValidTx(tx2) returns: " + txHandler.isValidTx(tx2));
-        Transaction[] selectedTrans = txHandler.handleTxs(new Transaction[]{tx2, tx3, tx4});
-        for(Transaction sTx: selectedTrans){
-            System.out.print(sTx.getHash() + " , ");
-        }
-        System.out.println("txHandler.handleTxs(new Transaction[]{tx2}) returns: " +
-                selectedTrans.length + " transaction(s)");
+        Transaction[] selectedTrans = txHandler.handleTxs(txs.toArray(new Transaction[txs.size()]));
 
+       for(Tx t : txs){
+           System.out.print(t.getHash() + " , " );
+       }
+       System.out.println("Selected Txs:");
+       for(Transaction sTx: selectedTrans){
+           System.out.print(sTx.getHash() + " , ");
+       }
     }
 
 

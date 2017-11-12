@@ -74,9 +74,12 @@ public class MaxFeeTxHandler {
      */
     public Transaction[] handleTxs(Transaction[] possibleTxs) {
         // IMPLEMENT THIS
+        allTransactions = possibleTxs;
         findNextValidTx(possibleTxs);
         return currentMaxFeesTxs;
     }
+
+    private Transaction[] allTransactions;
 
     private Stack<Transaction> tempTxs = new Stack<>();
     private double maxTxFee = 0;
@@ -110,7 +113,7 @@ public class MaxFeeTxHandler {
             currentValidTxsTotalFees += transactionFees.get(cvt);
         }
         //if this is the max fee tx set ever found, store it in currentMaxFeesTxs
-        System.out.println("currentValideTotal:"+currentValidTxsTotalFees + ", max:" + maxTxFee);
+        //System.out.println("currentValideTotal:"+currentValidTxsTotalFees + ", max:" + maxTxFee);
         if(currentValidTxsTotalFees >= maxTxFee){
             maxTxFee = currentValidTxsTotalFees;
             currentMaxFeesTxs = currentValidTxs;
@@ -133,7 +136,9 @@ public class MaxFeeTxHandler {
             currentUTXOPool.removeUTXO(utxo);
 
         }
-        findNextValidTx(possibleTxs);
+        //last tx index in the origin tx array
+        int lastTxIndex = Arrays.asList(allTransactions).indexOf(lastTxInStack);
+        findNextValidTx(Arrays.copyOfRange(allTransactions, lastTxIndex+1, allTransactions.length));
         return;
     }
 
