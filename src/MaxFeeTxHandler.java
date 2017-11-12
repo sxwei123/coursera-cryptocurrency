@@ -137,9 +137,16 @@ public class MaxFeeTxHandler {
 
         }
         //last tx index in the origin tx array
-        int lastTxIndex = Arrays.asList(allTransactions).indexOf(lastTxInStack);
+        int lastTxIndex = findTxIndex(lastTxInStack);
         findNextValidTx(Arrays.copyOfRange(allTransactions, lastTxIndex+1, allTransactions.length));
         return;
+    }
+
+    private int findTxIndex(Transaction t){
+        for(int i=0; i<allTransactions.length; i++){
+            if(allTransactions[i] == t) return i;
+        }
+        return -1;
     }
 
     private boolean removeTxFromUTXOPoolIfValid(Transaction tx){
