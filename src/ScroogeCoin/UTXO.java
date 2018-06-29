@@ -1,16 +1,18 @@
+package ScroogeCoin;
+
 import java.util.Arrays;
 
-// Unspent Transaction Output
+// Unspent ScroogeCoin.Transaction Output
 public class UTXO implements Comparable<UTXO> {
 
-    /** Hash of the transaction from which this UTXO originates */
+    /** Hash of the transaction from which this ScroogeCoin.UTXO originates */
     private byte[] txHash;
 
     /** Index of the corresponding output in said transaction */
     private int index;
 
     /**
-     * Creates a new UTXO corresponding to the output with index <index> in the transaction whose
+     * Creates a new ScroogeCoin.UTXO corresponding to the output with index <index> in the transaction whose
      * hash is {@code txHash}
      */
     public UTXO(byte[] txHash, int index) {
@@ -18,18 +20,18 @@ public class UTXO implements Comparable<UTXO> {
         this.index = index;
     }
 
-    /** @return the transaction hash of this UTXO */
+    /** @return the transaction hash of this ScroogeCoin.UTXO */
     public byte[] getTxHash() {
         return txHash;
     }
 
-    /** @return the index of this UTXO */
+    /** @return the index of this ScroogeCoin.UTXO */
     public int getIndex() {
         return index;
     }
 
     /**
-     * Compares this UTXO to the one specified by {@code other}, considering them equal if they have
+     * Compares this ScroogeCoin.UTXO to the one specified by {@code other}, considering them equal if they have
      * {@code txHash} arrays with equal contents and equal {@code index} values
      */
     public boolean equals(Object other) {
@@ -53,7 +55,7 @@ public class UTXO implements Comparable<UTXO> {
     }
 
     /**
-     * Simple implementation of a UTXO hashCode that respects equality of UTXOs // (i.e.
+     * Simple implementation of a ScroogeCoin.UTXO hashCode that respects equality of UTXOs // (i.e.
      * utxo1.equals(utxo2) => utxo1.hashCode() == utxo2.hashCode())
      */
     public int hashCode() {
@@ -63,7 +65,7 @@ public class UTXO implements Comparable<UTXO> {
         return hash;
     }
 
-    /** Compares this UTXO to the one specified by {@code utxo} */
+    /** Compares this ScroogeCoin.UTXO to the one specified by {@code utxo} */
     public int compareTo(UTXO utxo) {
         byte[] hash = utxo.txHash;
         int in = utxo.index;

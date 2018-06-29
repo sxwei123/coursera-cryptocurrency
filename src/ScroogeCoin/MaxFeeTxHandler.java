@@ -1,3 +1,5 @@
+package ScroogeCoin;
+
 import java.util.*;
 
 /**
@@ -7,8 +9,8 @@ public class MaxFeeTxHandler {
 
     private UTXOPool currentUTXOPool;
     /**
-     * Creates a public ledger whose current UTXOPool (collection of unspent transaction outputs) is
-     * {@code utxoPool}. This should make a copy of utxoPool by using the UTXOPool(UTXOPool uPool)
+     * Creates a public ledger whose current ScroogeCoin.UTXOPool (collection of unspent transaction outputs) is
+     * {@code utxoPool}. This should make a copy of utxoPool by using the ScroogeCoin.UTXOPool(ScroogeCoin.UTXOPool uPool)
      * constructor.
      */
     public MaxFeeTxHandler(UTXOPool utxoPool) {
@@ -18,9 +20,9 @@ public class MaxFeeTxHandler {
 
     /**
      * @return true if:
-     * (1) all outputs claimed by {@code tx} are in the current UTXO pool,
+     * (1) all outputs claimed by {@code tx} are in the current ScroogeCoin.UTXO pool,
      * (2) the signatures on each input of {@code tx} are valid,
-     * (3) no UTXO is claimed multiple times by {@code tx},
+     * (3) no ScroogeCoin.UTXO is claimed multiple times by {@code tx},
      * (4) all of {@code tx}s output values are non-negative, and
      * (5) the sum of {@code tx}s input values is greater than or equal to the sum of its output
      *     values; and false otherwise.
@@ -35,7 +37,7 @@ public class MaxFeeTxHandler {
             Transaction.Input input = tx.getInput(i);
             //construct utxo for comparison
             UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
-            // all outputs claimed by tx should be in the current UTXO pool
+            // all outputs claimed by tx should be in the current ScroogeCoin.UTXO pool
             if(!currentUTXOPool.contains(utxo)) return false;
 
             // get the unspent output(coin) from the utxoPool
@@ -43,7 +45,7 @@ public class MaxFeeTxHandler {
             // the signatures on each input of should be valid
             if(!Crypto.verifySignature(prevOutput.address, tx.getRawDataToSign(i), input.signature)) return false;
 
-            //check if this UTXO already claimed
+            //check if this ScroogeCoin.UTXO already claimed
             if(utxosClaimed.contains(utxo)) return false;
             //put this utxo into claimed utxos
             utxosClaimed.add(utxo);
@@ -70,7 +72,7 @@ public class MaxFeeTxHandler {
     /**
      * Handles each epoch by receiving an unordered array of proposed transactions, checking each
      * transaction for correctness, returning a mutually valid array of accepted transactions, and
-     * updating the current UTXO pool as appropriate.
+     * updating the current ScroogeCoin.UTXO pool as appropriate.
      */
     public Transaction[] handleTxs(Transaction[] possibleTxs) {
         // IMPLEMENT THIS
