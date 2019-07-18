@@ -1,6 +1,8 @@
 package ScroogeCoin;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class TxHandler {
@@ -68,12 +70,18 @@ public class TxHandler {
     public Transaction[] handleTxs(Transaction[] possibleTxs) {
         // IMPLEMENT THIS
         // mutually valid array of accepted transactions
-        Transaction[] mvTxs = new Transaction[possibleTxs.length];
+        List<Transaction> mvTxs = new ArrayList<Transaction>();
         int index = 0;
         for(Transaction ptx: possibleTxs){
-            if(removeTxFromUTXOPoolIfValid(ptx)){
-                mvTxs[index] = ptx;
+            if(isValidTx(ptx)){
+                for(int i=0; i < ptx.numInputs(); i++){
+                    Transaction.Input input = ptx.getInput(i);
+                    UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
+                    currentUTXOPool.removeUTXO(utxo);
+                }
+                mvTxs.add(ptx);
                 index++;
+
                 //valid transaction's outputs can be the input of current or next transactions, add ptx's outputs to utxoPool
                 for(int i=0; i<ptx.numOutputs(); i++){
                     UTXO utxo = new UTXO(ptx.getHash(), i);
@@ -82,18 +90,7 @@ public class TxHandler {
             }
         }
 
-        return mvTxs;
+        return mvTxs.toArray(new Transaction[0]);
     }
 
-    private boolean removeTxFromUTXOPoolIfValid(Transaction tx){
-        if(isValidTx(tx)){
-            for(int i=0; i < tx.numInputs(); i++){
-                Transaction.Input input = tx.getInput(i);
-                UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
-                currentUTXOPool.removeUTXO(utxo);
-            }
-            return true;
-        }
-        return false;
-    }
 }
