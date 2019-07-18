@@ -1,7 +1,7 @@
 package ScroogeCoin;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TxHandler {
 
@@ -18,7 +18,7 @@ public class TxHandler {
 
     /**
      * @return true if:
-     * (1) all outputs claimed by {@code tx} are in the current ScroogeCoin.UTXO pool,
+     * (1) all outputs claimed by the inputs of {@code tx} are in the current ScroogeCoin.UTXO pool,
      * (2) the signatures on each input of {@code tx} are valid, 
      * (3) no ScroogeCoin.UTXO is claimed multiple times by {@code tx},
      * (4) all of {@code tx}s output values are non-negative, and
@@ -30,7 +30,7 @@ public class TxHandler {
 
         double inputValueSum = 0;
         double outputValueSum = 0;
-        List<UTXO> utxosClaimed = new ArrayList<UTXO>();
+        Set<UTXO> utxosClaimed = new HashSet<UTXO>();
         for(int i=0; i < tx.numInputs(); i++){
             Transaction.Input input = tx.getInput(i);
             //construct utxo for comparison
