@@ -42,7 +42,7 @@ public class TxHandler {
 
             // get the unspent output(coin) from the utxoPool
             Transaction.Output prevOutput = currentUTXOPool.getTxOutput(utxo);
-            // the signatures on each input of should be valid
+            // the signature in each input of should be valid
             if(!Crypto.verifySignature(prevOutput.address, tx.getRawDataToSign(i), input.signature)) return false;
 
             //check if this ScroogeCoin.UTXO already claimed
@@ -74,6 +74,7 @@ public class TxHandler {
         int index = 0;
         for(Transaction ptx: possibleTxs){
             if(isValidTx(ptx)){
+                // remove outputs claimed by ptx from currentUTXOPool
                 for(int i=0; i < ptx.numInputs(); i++){
                     Transaction.Input input = ptx.getInput(i);
                     UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
